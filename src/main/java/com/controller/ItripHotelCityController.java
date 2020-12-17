@@ -45,7 +45,7 @@ public class ItripHotelCityController {
                List<ItripAreaDicVO> areaDicVOList=new ArrayList<>();
                for(ItripAreaDic itripAreaDic : itripAreaDicList){
                    ItripAreaDicVO itripAreaDicVO=new ItripAreaDicVO();
-                   System.out.println("itripAreaDic"+itripAreaDic.getName());
+
                    BeanUtils.copyProperties(itripAreaDic,itripAreaDicVO);
                    areaDicVOList.add(itripAreaDicVO);
                }
@@ -70,7 +70,7 @@ public class ItripHotelCityController {
            map.put("isTradingArea",1);
             try {
                 List<ItripAreaDic> itripLabelDics=itripAreaDicSerivce.getItripAreaDicListByMap(map);
-                System.out.println("itripLabelDics======"+itripLabelDics);
+
            if(EmptyUtils.isNotEmpty(itripLabelDics)){
                List<ItripAreaDicVO> itripAreaDicVOS=new ArrayList<>();
                for(ItripAreaDic areaDic : itripLabelDics){
@@ -128,7 +128,7 @@ public class ItripHotelCityController {
         }
 
     }
-    @RequestMapping(value = "/getimg/{targetId}")
+  /*  @RequestMapping(value = "/getimg/{targetId}")
     public Dto getimg(@PathVariable String targetId){
         System.out.println("查询酒店图片方法进入。。。");
         if(EmptyUtils.isNotEmpty(targetId)){
@@ -137,7 +137,7 @@ public class ItripHotelCityController {
             return DtoUtil.returnFail("targetId不能为空","100213");
         }
         return  null;
-    }
+    }*/
     @RequestMapping(value = "/getvideodesc/{hotelId}")
     public Dto getvideodesc(@PathVariable long hotelId){
         System.out.println("查询酒店特色，商圈，名称方法进入。。。。");
