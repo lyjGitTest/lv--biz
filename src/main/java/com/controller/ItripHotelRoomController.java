@@ -69,12 +69,11 @@ public class ItripHotelRoomController {
             List<ItripImageVO> itripImageVOList = itripImageService.getItripImageListByMap(map);
             return DtoUtil.returnDataSuccess(itripImageVOList);
         } catch(Exception e){
-            e.printStackTrace();
+            return DtoUtil.returnFail("获取酒店房型图片失败","100301");
         }
     }else{
         return DtoUtil.returnFail("酒店房型id不能为空","100302");
     }
-    return null;
 }
 @RequestMapping(value = "/queryhotelroombed")
     public Dto queryhotelroombed(){
