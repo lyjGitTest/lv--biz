@@ -2,6 +2,7 @@ package com.controller;
 
 import com.po.Dto;
 import com.serivce.ItripHotelRoomSerivce;
+import com.serivce.ItripImageService;
 import com.serivce.ItripLabelDicSerivce;
 import com.util.DtoUtil;
 import com.util.EmptyUtils;
@@ -24,6 +25,8 @@ public class ItripHotelRoomController {
     private ItripHotelRoomSerivce itripHotelRoomSerivce;
     @Autowired
     private ItripLabelDicSerivce itripLabelDicSerivce;
+    @Autowired
+    private ItripImageService itripImageService;
     @RequestMapping(value = "/queryhotelroombyhotel")
     public Dto queryhotelroombyhotel(@RequestBody SearchHotelRoomVO searchHotelRoomVO){
         System.out.println("查询酒店房间列表方法进入。。。");
@@ -37,11 +40,11 @@ public class ItripHotelRoomController {
        map.put("isHavingBreakfast",searchHotelRoomVO.getIsHavingBreakfast());
        map.put("isTimelyResponse",searchHotelRoomVO.getIsTimelyResponse());
        map.put("roomBedTypeId",searchHotelRoomVO.getRoomBedTypeId());
-      if(searchHotelRoomVO.getPayType()==3 || EmptyUtils.isNotEmpty(searchHotelRoomVO.getPayType())) {
-          map.put("payType", null);
-      }else{
-          map.put("payType", searchHotelRoomVO.getPayType());
-      }
+        if(EmptyUtils.isEmpty(searchHotelRoomVO.getPayType())||searchHotelRoomVO.getPayType()==3){
+            map.put("payType",null);
+        }else{
+            map.put("payType",searchHotelRoomVO.getPayType());
+        }
       try {
           List<ItripHotelRoomVO> itripHotelRoomVOList=itripHotelRoomSerivce.getItripHotelRoomListByMap(map);
        List<List<ItripHotelRoomVO>> lists=new ArrayList<>();
@@ -60,7 +63,10 @@ public class ItripHotelRoomController {
     System.out.println("根据酒店房型ID查询酒店房型图片方法进入。。。。");
     if (EmptyUtils.isNotEmpty(targetId)) {
     try {
-            List<ItripImageVO> itripImageVOList = itripHotelRoomSerivce.getimg(targetId);
+        Map<String,Object> map=new HashMap<>();
+        map.put("type",1);
+        map.put("targetId",targetId);
+            List<ItripImageVO> itripImageVOList = itripImageService.getItripImageListByMap(map);
             return DtoUtil.returnDataSuccess(itripImageVOList);
         } catch(Exception e){
             e.printStackTrace();
