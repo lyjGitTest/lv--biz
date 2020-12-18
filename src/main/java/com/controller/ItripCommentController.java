@@ -25,7 +25,6 @@ import java.util.Map;
 public class ItripCommentController {
     @Autowired
     private ItripCommentSerivce itripCommentSerivce;
-
     @RequestMapping("/gethotelscore/{hotelId}")
     public Dto gethotelscore(@PathVariable Long hotelId) {
         System.out.println("根据酒店id查询酒店平均分方法进入。。。。");
