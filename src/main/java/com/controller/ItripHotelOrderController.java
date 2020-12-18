@@ -2,33 +2,27 @@ package com.controller;
 
 
 import com.po.Dto;
-import com.po.TtripHotelOrder;
-import com.serivce.ItripHotelOrderSerivce;
 import com.serivce.ItripHotelTempStoreService;
-import com.util.DtoUtil;
+import com.util.vo.RoomStoreVO;
 import com.util.vo.StoreVO;
 import com.util.vo.ValidateRoomStoreVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/api/hotelorder")
+@RequestMapping(value = "/api/hotelorder/")
 public class ItripHotelOrderController {
-    @Autowired
-    private ItripHotelOrderSerivce itripHotelOrderSerivce;
 @Autowired
 private ItripHotelTempStoreService itripHotelTempStoreService;
 @RequestMapping(value = "/getpreorderinfo")
-    public Dto<StoreVO> getpreorderinfo(HttpServletRequest request, HttpServletResponse response, @PathVariable ValidateRoomStoreVO validateRoomStoreVO){
+    public Dto<RoomStoreVO> getpreorderinfo(HttpServletRequest request, HttpServletResponse response, @PathVariable ValidateRoomStoreVO validateRoomStoreVO){
     System.out.println("生成订单前,获取预订信息方法进入。。。");
     String tocken=request.getHeader("tocken");
     System.out.println("tocken==="+tocken);
