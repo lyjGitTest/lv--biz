@@ -4,7 +4,6 @@ package com.controller;
 import com.po.Dto;
 import com.serivce.ItripHotelTempStoreService;
 import com.util.vo.RoomStoreVO;
-import com.util.vo.StoreVO;
 import com.util.vo.ValidateRoomStoreVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +23,8 @@ private ItripHotelTempStoreService itripHotelTempStoreService;
 @RequestMapping(value = "/getpreorderinfo")
     public Dto<RoomStoreVO> getpreorderinfo(HttpServletRequest request, HttpServletResponse response, @PathVariable ValidateRoomStoreVO validateRoomStoreVO){
     System.out.println("生成订单前,获取预订信息方法进入。。。");
-    String tocken=request.getHeader("tocken");
-    System.out.println("tocken==="+tocken);
+    String tocken=request.getHeader("token");
+    System.out.println("token==="+tocken);
     Map<String,Object> map=new HashMap<>();
     return null;
 }
