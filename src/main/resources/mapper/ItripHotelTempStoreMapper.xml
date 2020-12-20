@@ -158,12 +158,13 @@
         delete from itrip_hotel_temp_store where id = #{id}
     </delete>
 
+    //callable 储存过程
     <update  id="flushStore" parameterType="java.util.Map" statementType="CALLABLE">
         {call pre_flush_store(
             #{startTime,jdbcType=DATE,mode=IN},
             #{endTime,jdbcType=DATE,mode=IN},
             #{roomId,jdbcType=BIGINT,mode=IN},
-            #{hotelId,jdbcType=BIGINT,mode=IN}
+
           )
         }
     </update >

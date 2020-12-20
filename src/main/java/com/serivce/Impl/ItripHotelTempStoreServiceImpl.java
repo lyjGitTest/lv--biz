@@ -22,6 +22,4 @@ public class ItripHotelTempStoreServiceImpl implements ItripHotelTempStoreServic
         itripHotelTempStoreMapper.flushStore(param);
         return itripHotelTempStoreMapper.queryRoomStore(param);
     }
-
-
 }
