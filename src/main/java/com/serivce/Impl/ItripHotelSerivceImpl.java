@@ -18,6 +18,12 @@ import java.util.List;
 public class ItripHotelSerivceImpl implements ItripHotelSerivce {
     @Autowired
     private ItripHotelMapper itripHotelMapper;
+
+    @Override
+    public ItripHotel getItripHotelById(Long id) throws Exception {
+        return itripHotelMapper.getItripHotelById(id);
+    }
+
     @Override
     public List<ItripSearchDetailsHotelVO> queryHotelDetails(Long id) throws Exception {
         return itripHotelMapper.queryHotelDetails(id);

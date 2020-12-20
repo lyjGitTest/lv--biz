@@ -27,7 +27,7 @@
         </if>
     </select>
 
-    <select id="getItripHotelById" resultType="com.po.ItripHotel" >
+    <select id="getItripHotelById" parameterType="Long" resultType="com.po.ItripHotel" >
         select
         id as id,
         hotelName as hotelName,

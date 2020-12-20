@@ -1,6 +1,7 @@
 package com.serivce.Impl;
 
 import com.mapper.ItripHotelTempStoreMapper;
+import com.po.ItripHotelTempStore;
 import com.serivce.ItripHotelTempStoreService;
 import com.util.vo.StoreVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,13 @@ import java.util.Map;
 public class ItripHotelTempStoreServiceImpl implements ItripHotelTempStoreService {
     @Autowired
     private ItripHotelTempStoreMapper itripHotelTempStoreMapper;
+
     @Override
     public List<StoreVO> queryRoomStore(Map<String, Object> param) throws Exception {
+        //实时库存表
+        itripHotelTempStoreMapper.flushStore(param);
         return itripHotelTempStoreMapper.queryRoomStore(param);
     }
+
+
 }

@@ -1,6 +1,7 @@
 package com.serivce.Impl;
 
 import com.mapper.ItripHotelRoomMapper;
+import com.po.ItripHotelRoom;
 import com.serivce.ItripHotelRoomSerivce;
 import com.util.vo.ItripHotelRoomVO;
 import com.util.vo.ItripImageVO;
@@ -16,6 +17,12 @@ import java.util.Map;
 public class ItripHotelRoomSerivceImpl implements ItripHotelRoomSerivce {
 @Autowired
 private ItripHotelRoomMapper itripHotelRoomMapper;
+
+    @Override
+    public ItripHotelRoom getItripHotelRoomById(Long id) throws Exception {
+        return itripHotelRoomMapper.getItripHotelRoomById(id);
+    }
+
     @Override
     public List<ItripImageVO> getimg(Long targetId) throws Exception {
         return null;
