@@ -54,7 +54,7 @@ public class ItripHotelCityController {
                return DtoUtil.returnFail("没有找到热门城市","10200");
            }
             } catch (Exception e) {
-                e.printStackTrace();
+                e.getMessage();
                 return DtoUtil.returnFail("系统异常，重新登陆","10202");
             }
         }else{
@@ -84,7 +84,7 @@ public class ItripHotelCityController {
                return DtoUtil.returnFail("itripLabelDics为空","11111");
            }
             } catch (Exception e) {
-                e.printStackTrace();
+                e.getMessage();
                 return DtoUtil.returnFail("系统异常","10204");
             }
         }else{
@@ -99,7 +99,7 @@ public class ItripHotelCityController {
                 List<ItripSearchDetailsHotelVO> itripSearchDetailsHotelVOList = itripHotelSerivce.queryHotelDetails(hotelId);
                 return DtoUtil.returnDataSuccess(itripSearchDetailsHotelVOList);
             } catch (Exception e) {
-                e.printStackTrace();
+                e.getMessage();
                return DtoUtil.returnFail("系统异常","10211");
             }
         }else{
@@ -113,7 +113,7 @@ public class ItripHotelCityController {
             List<ItripLabelDicVO> itripLabelDicVOS=itripLabelDicSerivce.getItripLabelDicById(16L);
         return DtoUtil.returnDataSuccess(itripLabelDicVOS);
         } catch (Exception e) {
-            e.printStackTrace();
+            e.getMessage();
             return DtoUtil.returnFail("系统异常","10205");
         }
     }
@@ -125,7 +125,7 @@ public class ItripHotelCityController {
                 ItripSearchPolicyHotelVO itripSearchPolicyHotelVO=itripHotelSerivce.queryHotelPolicy(id);
             return DtoUtil.returnDataSuccess(itripSearchPolicyHotelVO.getHotelPolicy());
             } catch (Exception e) {
-                e.printStackTrace();
+                e.getMessage();
                 return DtoUtil.returnFail("系统异常","10209");
             }
         }else{
@@ -151,7 +151,7 @@ public class ItripHotelCityController {
                 HotelVideoDescVO hotelVideoDescVO=itripHotelSerivce.queryWenzimianshu(hotelId);
            return DtoUtil.returnDataSuccess(hotelVideoDescVO);
             } catch (Exception e) {
-                e.printStackTrace();
+                e.getMessage();
                 return DtoUtil.returnFail("系统异常","100214");
             }
         }else{
@@ -167,7 +167,7 @@ public class ItripHotelCityController {
                 ItripSearchFacilitiesHotelVO searchFacilitiesHotelVO=itripHotelSerivce.getItripHotelFacilitiesById(id);
             return  DtoUtil.returnDataSuccess(searchFacilitiesHotelVO.getFacilities());
             } catch (Exception e) {
-                e.printStackTrace();
+                e.getMessage();
                 return DtoUtil.returnFail("系统异常","10207");
             }
         }else{

@@ -184,7 +184,7 @@ public class ItripHotelOrderController {
                     return DtoUtil.returnFail("token失效，请重登录", "100000");
                 }
         } catch (Exception e) {
-            e.printStackTrace();
+            e.getMessage();
             return DtoUtil.returnFail("系统异常","100517");
         }
 
