@@ -16,10 +16,7 @@ import com.util.vo.RoomStoreVO;
 import com.util.vo.StoreVO;
 import com.util.vo.ValidateRoomStoreVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
@@ -99,6 +96,9 @@ public class ItripHotelOrderController {
     //生成订单
     @RequestMapping(value = "/addhotelorder")
     public Dto addhotelorder(HttpServletRequest request,HttpServletResponse response,@RequestBody ItripAddHotelOrderVO itripAddHotelOrderVO) {
+        if(EmptyUtils.isEmpty(itripAddHotelOrderVO) || (itripAddHotelOrderVO.getHotelId()==null || itripAddHotelOrderVO.getHotelId()==0) || (itripAddHotelOrderVO.getRoomId()==null || itripAddHotelOrderVO.getRoomId()==0) ){
+            return DtoUtil.returnFail("不能提交空，请填写订单信息","100506");
+        }
         System.out.println("生成订单方法进入。。。");
         try {
             String tocken = request.getHeader("token");
@@ -118,6 +118,8 @@ public class ItripHotelOrderController {
                 itripHotelOrder.setCheckOutDate(itripAddHotelOrderVO.getCheckOutDate());
                 itripHotelOrder.setHotelName(itripAddHotelOrderVO.getHotelName());
                 itripHotelOrder.setIsNeedInvoice(itripAddHotelOrderVO.getIsNeedInvoice());
+                itripHotelOrder.setNoticePhone(itripAddHotelOrderVO.getNoticePhone());
+                itripHotelOrder.setNoticeEmail(itripAddHotelOrderVO.getNoticeEmail());
                 //天数
                 itripHotelOrder.setBookingDays(ds);
                 itripHotelOrder.setId(itripAddHotelOrderVO.getId());
@@ -172,15 +174,27 @@ public class ItripHotelOrderController {
                     BigDecimal bigDecimal2 = bigDecimal.multiply(bigDecimal1);
                     itripHotelOrder.setPayAmount(itripHotelRoomSerivce.getItripHotelRoomById(itripAddHotelOrderVO.getRoomId()).getRoomPrice().multiply(bigDecimal2));
                 Map<String,Object> param=itripHotelOrderService.insertItripHotelOrder(itripHotelOrder);
+                if(EmptyUtils.isNotEmpty(param)){
                 return DtoUtil.returnDataSuccess(param);
+                }
+                else{
+                    return DtoUtil.returnFail("生成订单失败","100505");
+                }
                 } else {
                     return DtoUtil.returnFail("token失效，请重登录", "100000");
                 }
-
-
         } catch (Exception e) {
             e.printStackTrace();
+            return DtoUtil.returnFail("系统异常","100517");
         }
+
+    }
+    //根据订单ID获取订单信息
+    @RequestMapping(value = "/queryOrderById/{orderId}",method = RequestMethod.GET)
+    public Dto queryOrderById(@PathVariable Long orderId){
+        System.out.println("根据订单ID获取订单信息方法进入。。。。");
+
         return null;
+
     }
         }
