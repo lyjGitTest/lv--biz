@@ -65,7 +65,6 @@ public class ItripUserLinkUserController {
                return DtoUtil.returnFail("添加失败","100411");
            }
             } catch (Exception e) {
-                e.getMessage();
                 return DtoUtil.returnFail("系统异常","100411");
             }
         }else {
@@ -90,7 +89,6 @@ public class ItripUserLinkUserController {
                     return DtoUtil.returnFail("删除失败", "100432");
                 }
             } catch (Exception e) {
-                e.getMessage();
                 return DtoUtil.returnFail("系统异常", "100411");
             }
         } else {
@@ -118,7 +116,6 @@ public class ItripUserLinkUserController {
             System.out.println(userLinkUserList);
             return  DtoUtil.returnSuccess("查询成功",userLinkUserList);
         } catch (Exception e) {
-            e.getMessage();
             return DtoUtil.returnFail("系统异常","100401");
         }
     }else {
@@ -152,7 +149,6 @@ public class ItripUserLinkUserController {
                     return DtoUtil.returnFail("修改失败","100421");
                 }
                 } catch (Exception e) {
-                    e.getMessage();
                     return DtoUtil.returnFail("系统异常","100411");
                 }
             }else {

@@ -55,7 +55,6 @@ public class ItripHotelRoomController {
        }
        return DtoUtil.returnDataSuccess(lists);
         } catch (Exception e) {
-          e.getMessage();
             return DtoUtil.returnFail("系统异常","100304");
         }
     }
@@ -70,7 +69,6 @@ public class ItripHotelRoomController {
             List<ItripImageVO> itripImageVOList = itripImageService.getItripImageListByMap(map);
             return DtoUtil.returnDataSuccess(itripImageVOList);
         } catch(Exception e){
-        e.getMessage();
             return DtoUtil.returnFail("获取酒店房型图片失败","100301");
         }
     }else{
@@ -84,7 +82,6 @@ public class ItripHotelRoomController {
         List<ItripLabelDicVO> itripAreaDicVOS=itripLabelDicSerivce.getItripLabelDicById(new Long(1));
      return DtoUtil.returnDataSuccess(itripAreaDicVOS);
     } catch (Exception e) {
-        e.getMessage();
         return DtoUtil.returnFail("获取酒店房间床型失败","100305");
     }
 }
