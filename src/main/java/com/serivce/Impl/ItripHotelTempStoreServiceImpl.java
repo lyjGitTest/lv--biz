@@ -19,7 +19,7 @@ public class ItripHotelTempStoreServiceImpl implements ItripHotelTempStoreServic
     @Override
     public List<StoreVO> queryRoomStore(Map<String, Object> param) throws Exception {
         //实时库存表
-        itripHotelTempStoreMapper.flushStore(param);
+        //itripHotelTempStoreMapper.flushStore(param);
         return itripHotelTempStoreMapper.queryRoomStore(param);
     }
 }
