@@ -55,6 +55,7 @@ public class ItripHotelRoomController {
        }
        return DtoUtil.returnDataSuccess(lists);
         } catch (Exception e) {
+          e.printStackTrace();
             return DtoUtil.returnFail("系统异常","100304");
         }
     }

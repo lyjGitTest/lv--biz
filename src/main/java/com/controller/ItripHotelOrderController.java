@@ -197,4 +197,34 @@ public class ItripHotelOrderController {
         return null;
 
     }
+    //根据订单ID查看个人订单详情
+    @RequestMapping(value = "/getpersonalorderinfo/{orderId}",method = RequestMethod.GET)
+    public Dto getpersonalorderinfo(HttpServletRequest request,@PathVariable Long orderId){
+        System.out.println("根据订单ID查看个人订单详情方法进入。。。。");
+       String token=request.getHeader("token");
+       Jedis jedis=new Jedis();
+       JSONObject jsonObject=JSONObject.parseObject(jedis.get(token));
+       ItripUser itripUser=JSONObject.toJavaObject(jsonObject,ItripUser.class);
+       if(EmptyUtils.isNotEmpty(itripUser)){
+
+       }else{
+           return DtoUtil.returnFail("token失效，请重登录","100000");
+       }
+        return null;
+    }
+    //根据订单ID查看个人订单详情-房型相关信息
+    @RequestMapping(value = "/getpersonalorderroominfo/{orderId}",method = RequestMethod.GET)
+    public Dto getpersonalorderroominfo(HttpServletRequest request,@PathVariable Long orderId){
+        System.out.println("根据订单ID查看个人订单详情-房型相关信息方法进入.....");
+        String token=request.getHeader("token");
+        Jedis jedis=new Jedis();
+        JSONObject jsonObject=JSONObject.parseObject(jedis.get(token));
+        ItripUser itripUser=JSONObject.toJavaObject(jsonObject,ItripUser.class);
+        if(EmptyUtils.isNotEmpty(itripUser)){
+
+        }else{
+            return DtoUtil.returnFail("token失效，请重登录","100000");
+        }
+        return null;
+    }
         }

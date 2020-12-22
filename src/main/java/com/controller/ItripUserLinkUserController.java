@@ -65,7 +65,8 @@ public class ItripUserLinkUserController {
                return DtoUtil.returnFail("添加失败","100411");
            }
             } catch (Exception e) {
-                return DtoUtil.returnFail(e.getMessage(),"100411");
+                e.printStackTrace();
+                return DtoUtil.returnFail("系统异常","100411");
             }
         }else {
             return DtoUtil.returnFail("tocken失效，重新登陆","100000");
@@ -89,7 +90,8 @@ public class ItripUserLinkUserController {
                     return DtoUtil.returnFail("删除失败", "100432");
                 }
             } catch (Exception e) {
-                return DtoUtil.returnFail(e.getMessage(), "100411");
+                e.printStackTrace();
+                return DtoUtil.returnFail("系统异常", "100411");
             }
         } else {
             return DtoUtil.returnFail("请选择用户", "100433");
@@ -116,7 +118,8 @@ public class ItripUserLinkUserController {
             System.out.println(userLinkUserList);
             return  DtoUtil.returnSuccess("查询成功",userLinkUserList);
         } catch (Exception e) {
-            return DtoUtil.returnFail(e.getMessage(),"100401");
+            e.printStackTrace();
+            return DtoUtil.returnFail("系统异常","100401");
         }
     }else {
         return DtoUtil.returnFail("tocken失效，重新登陆","100000");
@@ -149,7 +152,8 @@ public class ItripUserLinkUserController {
                     return DtoUtil.returnFail("修改失败","100421");
                 }
                 } catch (Exception e) {
-                    return DtoUtil.returnFail(e.getMessage(),"100411");
+                    e.printStackTrace();
+                    return DtoUtil.returnFail("系统异常","100411");
                 }
             }else {
                 return DtoUtil.returnFail("不能提交为空，请填写","100422");
