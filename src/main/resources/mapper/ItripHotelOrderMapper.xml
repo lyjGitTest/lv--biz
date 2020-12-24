@@ -83,7 +83,7 @@
         hotelName as hotelName,
         orderStatus as orderStatus,
         count as count,
-        checkInDate as checkInDate,
+        checkInDate as d,
         payAmount as payAmount,
         payType as payType,
         linkUserName as linkUserName,

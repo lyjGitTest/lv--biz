@@ -5,11 +5,16 @@ import com.mapper.ItripOrderLinkUserMapper;
 import com.po.ItripHotelOrder;
 import com.po.ItripOrderLinkUser;
 import com.serivce.ItripHotelOrderService;
+import com.util.Constants;
+import com.util.EmptyUtils;
+import com.util.Page;
 import com.util.vo.ItripListHotelOrderVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,5 +47,36 @@ public class ItripHotelOrderServiceImpl implements ItripHotelOrderService {
             }
         }
         return null;
+    }
+
+    @Override
+    public ItripHotelOrder getItripHotelOrderById(Long id) throws Exception {
+        return itripHotelOrderMapper.getItripHotelOrderById(id);
+    }
+
+    @Override
+    public Page<ItripListHotelOrderVO> getOrderListByMap(Map<String, Object> param,Integer pageNo,Integer pageSize) throws Exception {
+       Integer c=itripHotelOrderMapper.getOrderCountByMap(param);
+        pageNo= EmptyUtils.isEmpty(pageNo)?Constants.DEFAULT_PAGE_NO:pageNo;
+        pageSize=EmptyUtils.isEmpty(pageSize)?Constants.DEFAULT_PAGE_SIZE:pageSize;
+        Page page=new Page(pageNo,pageSize,c);
+        param.put("beginPos",page.getBeginPos());
+        param.put("pageSize",page.getPageSize());
+        List<ItripListHotelOrderVO> itripListHotelOrderVOS=itripHotelOrderMapper.getOrderListByMap(param);
+        for(ItripListHotelOrderVO itripListHotelOrderVO:itripListHotelOrderVOS) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String strDate = sdf.format(itripListHotelOrderVO.getCreationDate()); //格式化成yyyy-MM-dd格式的时间字符串
+            Date newDate = sdf.parse(strDate);
+            java.sql.Date resultDate = new java.sql.Date(newDate.getTime());
+            itripListHotelOrderVO.setCreationDate(resultDate);
+
+            String date=sdf.format(itripListHotelOrderVO.getCheckInDate());
+            Date date1=sdf.parse(date);
+            java.sql.Date resultDate1 = new java.sql.Date(date1.getTime());
+            itripListHotelOrderVO.setCheckInDate(resultDate1);
+     //itripListHotelOrderVO.setD(resultDate+"/"+resultDate1);
+        }
+        page.setRows(itripListHotelOrderVOS);
+        return page;
     }
 }

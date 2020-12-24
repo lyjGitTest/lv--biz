@@ -1,6 +1,7 @@
 package com.util.vo;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -17,9 +18,19 @@ public class ItripListHotelOrderVO {
     private String linkUserName;	//旅客的姓名，多个旅客的姓名之间用逗号隔开
     private Date creationDate;      //预定时间
     private Date checkInDate;       //入住时间（行程/有效日期）
+   // private String d;
     private BigDecimal payAmount;   //订单金额
     private Integer orderStatus;    //订单状态（0：待支付 1:已取消 2:支付成功 3:已消费）
 
+    /*public String getD() {
+        d=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(checkInDate);
+        return d;
+    }
+
+    public void setD(String d) {
+        this.d = d;
+    }
+*/
     public Long getId() {
         return id;
     }

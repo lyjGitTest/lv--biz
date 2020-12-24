@@ -3,18 +3,9 @@ package com.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.po.*;
-import com.serivce.ItripHotelOrderService;
-import com.serivce.ItripHotelRoomSerivce;
-import com.serivce.ItripHotelSerivce;
-import com.serivce.ItripHotelTempStoreService;
-import com.util.DateUtil;
-import com.util.DtoUtil;
-import com.util.EmptyUtils;
-import com.util.MD5Util;
-import com.util.vo.ItripAddHotelOrderVO;
-import com.util.vo.RoomStoreVO;
-import com.util.vo.StoreVO;
-import com.util.vo.ValidateRoomStoreVO;
+import com.serivce.*;
+import com.util.*;
+import com.util.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.Jedis;
@@ -22,6 +13,8 @@ import redis.clients.jedis.Jedis;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -35,6 +28,8 @@ public class ItripHotelOrderController {
     private ItripHotelSerivce itripHotelSerivce;
     @Autowired
     private ItripHotelTempStoreService itripHotelTempStoreService;
+    @Autowired
+    private ItripLabelDicSerivce itripLabelDicSerivce;
     // 生成订单前,获取预订信息方法
     @RequestMapping(value = "/getpreorderinfo")
     public Dto<RoomStoreVO> getpreorderinfo(HttpServletRequest request, HttpServletResponse response, @RequestBody ValidateRoomStoreVO validateRoomStoreVO) {
@@ -46,6 +41,7 @@ public class ItripHotelOrderController {
             String usecodetocken = jedis.get(token);
             JSONObject jsonObject=JSONObject.parseObject(usecodetocken.toString());
             ItripUser itripUser=JSONObject.toJavaObject(jsonObject,ItripUser.class);
+            System.out.println("itripUser=="+itripUser.toString());
             if (EmptyUtils.isNotEmpty(itripUser)) {
                 Map<String, Object> strMap = JSON.parseObject(usecodetocken);
                 Object user = strMap.get("usercode");
@@ -62,7 +58,7 @@ public class ItripHotelOrderController {
                         param.put("startTime", validateRoomStoreVO.getCheckInDate());
                         param.put("endTime", validateRoomStoreVO.getCheckOutDate());
                         List<StoreVO> storeVOList = itripHotelTempStoreService.queryRoomStore(param);
-
+                        System.out.println("store=="+storeVOList.get(0).getStore());
                         //RoomStoreVO
                            RoomStoreVO roomStoreVO = new RoomStoreVO();
                            roomStoreVO.setHotelId(validateRoomStoreVO.getHotelId());
@@ -72,7 +68,7 @@ public class ItripHotelOrderController {
                            roomStoreVO.setCheckOutDate(validateRoomStoreVO.getCheckOutDate());
                            roomStoreVO.setCount(validateRoomStoreVO.getCount());
                            roomStoreVO.setPrice(price);
-                        if(EmptyUtils.isNotEmpty(storeVOList)) {
+                        if(EmptyUtils.isNotEmpty(storeVOList) && storeVOList.get(0).getStore()!=0){
                             System.out.println("storeVoList.size()===" + storeVOList.size());
                             roomStoreVO.setStore(storeVOList.get(0).getStore());
                         } else{
@@ -89,7 +85,6 @@ public class ItripHotelOrderController {
                 return DtoUtil.returnFail("token失效，请重登录", "100000");
             }
         } catch (Exception e) {
-
             return DtoUtil.returnFail("系统异常", "100513");
         }
     }
@@ -105,6 +100,7 @@ public class ItripHotelOrderController {
             Jedis jedis = new Jedis();
             JSONObject jsonObject = JSONObject.parseObject(jedis.get(tocken).toString());
             ItripUser itripUser = JSONObject.toJavaObject(jsonObject, ItripUser.class);
+
             if (EmptyUtils.isNotEmpty(itripUser)) {
                 //预定天数
                 List<Date> days = DateUtil.getBetweenDates(itripAddHotelOrderVO.getCheckInDate(), itripAddHotelOrderVO.getCheckOutDate());
@@ -186,18 +182,85 @@ public class ItripHotelOrderController {
         } catch (Exception e) {
             return DtoUtil.returnFail("系统异常","100517");
         }
-
     }
     //根据订单ID获取订单信息
-    @RequestMapping(value = "/queryOrderById/{orderId}",method = RequestMethod.GET)
+    @RequestMapping(value = "/queryOrderById/{orderId}")
     public Dto queryOrderById(@PathVariable Long orderId){
         System.out.println("根据订单ID获取订单信息方法进入。。。。");
-
+        if(EmptyUtils.isNotEmpty(orderId)) {
+            try {
+                ItripHotelOrder itripHotelOrder = itripHotelOrderService.getItripHotelOrderById(orderId);
+                System.out.println("Order===" + itripHotelOrder.toString());
+                ItripHotelRoom itripHotelRoom = itripHotelRoomSerivce.getItripHotelRoomById(itripHotelOrder.getRoomId());
+                Map<String, Object> map = new HashMap<>();
+                map.put("count", itripHotelOrder.getCount());
+                map.put("hotelId", itripHotelOrder.getHotelId());
+                map.put("roomId", itripHotelOrder.getRoomId());
+                map.put("roomTitle", itripHotelRoom.getRoomTitle());
+                map.put("hotelName", itripHotelOrder.getHotelName());
+                map.put("payAmount", itripHotelOrder.getPayAmount().intValue());
+                /*map.put("startTime",itripHotelOrder.getCheckInDate());
+                map.put("endTime",itripHotelOrder.getCheckOutDate());*/
+              map.put("startTime", DateUtil.format(itripHotelOrder.getCheckInDate(), "yyyy-MM-dd"));
+                map.put("endTime", DateUtil.format(itripHotelOrder.getCheckOutDate(), "yyyy-MM-dd"));
+                map.put("bookingDays", itripHotelOrder.getBookingDays());
+                System.out.println("map==" + map);
+                return DtoUtil.returnDataSuccess(map);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else{
+            return DtoUtil.returnFail("请传递参数：orderId","100525");
+        }
         return null;
 
     }
+    //根据个人订单列表，并分页显示
+    @RequestMapping(value = "/getpersonalorderlist")
+    public Dto getpersonalorderlist(HttpServletRequest request,@RequestBody ItripSearchOrderVO itripSearchOrderVO) throws ParseException {
+        System.out.println("根据个人订单列表，并分页显示方法进入。。。");
+        String token=request.getHeader("token");
+        Jedis jedis=new Jedis();
+        JSONObject jsonObject=JSONObject.parseObject(jedis.get(token));
+        ItripUser itripUser=JSONObject.toJavaObject(jsonObject,ItripUser.class);
+        if(EmptyUtils.isNotEmpty(itripUser)) {
+            Integer orderStatus=itripSearchOrderVO.getOrderStatus();
+            if(orderStatus!=-1) {
+            return DtoUtil.returnFail("订单状态","111111");
+            }
+            System.out.println("itripSearchOrderVO==="+itripSearchOrderVO.toString());
+                Map<String, Object> map = new HashMap<>();
+                map.put("userId",itripUser.getId());
+                map.put("orderNo",itripSearchOrderVO.getOrderNo());
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                if(itripSearchOrderVO.getEndDate()==null){
+                    map.put("endDate", null);
+                }else {
+                    String strDate = sdf.format(itripSearchOrderVO.getEndDate()); //格式化成yyyy-MM-dd格式的时间字符串
+                    Date newDate = sdf.parse(strDate);
+                    java.sql.Date resultDate = new java.sql.Date(newDate.getTime());
+                    map.put("endDate", resultDate);
+                }
+                map.put("pageNo",itripSearchOrderVO.getPageNo());
+                map.put("pageSize",itripSearchOrderVO.getPageSize());
+                map.put("linkUserName",itripSearchOrderVO.getLinkUserName());
+                map.put("startDate",itripSearchOrderVO.getStartDate());
+                map.put("orderStatus",itripSearchOrderVO.getOrderStatus()==-1?null:itripSearchOrderVO.getOrderStatus());
+                map.put("orderType",itripSearchOrderVO.getOrderType()==-1?null:itripSearchOrderVO.getOrderType());
+            System.out.println("map===="+map.get("endDate"));
+                try {
+                    Page page = itripHotelOrderService.getOrderListByMap(map, itripSearchOrderVO.getPageNo(), itripSearchOrderVO.getPageSize());
+               return DtoUtil.returnDataSuccess(page);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+        }else{
+            return  DtoUtil.returnFail("token失效，请重登录","100000");
+        }
+        return null;
+    }
     //根据订单ID查看个人订单详情
-    @RequestMapping(value = "/getpersonalorderinfo/{orderId}",method = RequestMethod.GET)
+    @RequestMapping(value = "/getpersonalorderinfo/{orderId}")
     public Dto getpersonalorderinfo(HttpServletRequest request,@PathVariable Long orderId){
         System.out.println("根据订单ID查看个人订单详情方法进入。。。。");
        String token=request.getHeader("token");
@@ -205,14 +268,47 @@ public class ItripHotelOrderController {
        JSONObject jsonObject=JSONObject.parseObject(jedis.get(token));
        ItripUser itripUser=JSONObject.toJavaObject(jsonObject,ItripUser.class);
        if(EmptyUtils.isNotEmpty(itripUser)){
-
+           try {
+               ItripHotelOrder itripHotelOrder=itripHotelOrderService.getItripHotelOrderById(orderId);
+              Integer orderStatus=itripHotelOrder.getOrderStatus();
+               ItripPersonalHotelOrderVO itripPersonalHotelOrderVO=new ItripPersonalHotelOrderVO();
+             itripPersonalHotelOrderVO.setId(itripHotelOrder.getId());
+             itripPersonalHotelOrderVO.setOrderNo(itripHotelOrder.getOrderNo());
+               //预定方式（0:WEB端 1:手机端 2:其他客户端）
+             itripPersonalHotelOrderVO.setBookType(itripHotelOrder.getBookType());
+             itripPersonalHotelOrderVO.setNoticePhone(itripHotelOrder.getNoticePhone());
+             itripPersonalHotelOrderVO.setPayAmount(itripHotelOrder.getPayAmount());
+               //支付方式:1:支付宝 2:微信 3:到店付
+             itripPersonalHotelOrderVO.setPayType(itripHotelOrder.getPayType());
+             itripPersonalHotelOrderVO.setProcessNode("");
+               //房间支持的支付方式 {"1":"在线付","2":"线下付","3":"不限"}
+             itripPersonalHotelOrderVO.setRoomPayType(1);
+               /**
+                * 订单流程:
+                * 1、待付款、待评价（已消费）、未出行（支付成功）
+                * 流程: 已提交-->待支付-->支付成功-->已入住-->已点评
+                * 2、已取消
+                * 流程: 已提交-->待支付-->已取消
+                */
+               Object process=null;
+               if(orderStatus==0){
+                   //待支付
+               }else if(orderStatus==1){
+                   //已取消
+               }
+             itripPersonalHotelOrderVO.setOrderProcess(process);
+               System.out.println("personalVo==="+itripPersonalHotelOrderVO.toString());
+               return DtoUtil.returnDataSuccess(itripPersonalHotelOrderVO.toString());
+           } catch (Exception e) {
+               e.printStackTrace();
+           }
        }else{
            return DtoUtil.returnFail("token失效，请重登录","100000");
        }
         return null;
     }
     //根据订单ID查看个人订单详情-房型相关信息
-    @RequestMapping(value = "/getpersonalorderroominfo/{orderId}",method = RequestMethod.GET)
+    @RequestMapping(value = "/getpersonalorderroominfo/{orderId}")
     public Dto getpersonalorderroominfo(HttpServletRequest request,@PathVariable Long orderId){
         System.out.println("根据订单ID查看个人订单详情-房型相关信息方法进入.....");
         String token=request.getHeader("token");
@@ -220,10 +316,59 @@ public class ItripHotelOrderController {
         JSONObject jsonObject=JSONObject.parseObject(jedis.get(token));
         ItripUser itripUser=JSONObject.toJavaObject(jsonObject,ItripUser.class);
         if(EmptyUtils.isNotEmpty(itripUser)){
+          ItripPersonalOrderRoomVO itripPersonalOrderRoomVO=new ItripPersonalOrderRoomVO();
+            try {
+                ItripHotelOrder itripHotelOrder=itripHotelOrderService.getItripHotelOrderById(orderId);
+                itripPersonalOrderRoomVO.setId(orderId);
+                itripPersonalOrderRoomVO.setHotelId(itripHotelOrder.getHotelId());
+                itripPersonalOrderRoomVO.setHotelName(itripHotelOrder.getHotelName());
+                itripPersonalOrderRoomVO.setBookingDays(itripHotelOrder.getBookingDays());
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");    //格式化规则
 
+                Date date = itripHotelOrder.getCheckInDate();         //获得你要处理的时间 Date型
+                String strDate= sdf.format(date); //格式化成yyyy-MM-dd格式的时间字符串
+                Date newDate =sdf.parse(strDate);
+                java.sql.Date resultDate = new java.sql.Date(newDate.getTime());
+                itripPersonalOrderRoomVO.setCheckInDate(resultDate);
+
+                Date date1 = itripHotelOrder.getCheckOutDate();         //获得你要处理的时间 Date型
+                String strDate1= sdf.format(date1); //格式化成yyyy-MM-dd格式的时间字符串
+                Date newDate1 =sdf.parse(strDate1);
+                java.sql.Date resultDate1 = new java.sql.Date(newDate1.getTime());
+                itripHotelOrder.setCheckOutDate(resultDate1);
+
+                itripPersonalOrderRoomVO.setCount(itripHotelOrder.getCount());
+                itripPersonalOrderRoomVO.setCheckOutDate(itripHotelOrder.getCheckOutDate());
+                itripPersonalOrderRoomVO.setLinkUserName(itripHotelOrder.getLinkUserName());
+                itripPersonalOrderRoomVO.setSpecialRequirement(itripHotelOrder.getSpecialRequirement());
+                itripPersonalOrderRoomVO.setPayAmount(itripHotelOrder.getPayAmount());
+                itripPersonalOrderRoomVO.setRoomPayType(1);
+                ItripHotel itripHotel=itripHotelSerivce.getItripHotelById(itripHotelOrder.getHotelId());
+                itripPersonalOrderRoomVO.setHotelLevel(itripHotel.getHotelLevel());
+                itripPersonalOrderRoomVO.setAddress(itripHotel.getAddress());
+                itripPersonalOrderRoomVO.setRoomId(itripHotelOrder.getRoomId());
+                ItripHotelRoom itripHotelRoom=itripHotelRoomSerivce.getItripHotelRoomById(itripHotelOrder.getRoomId());
+                itripPersonalOrderRoomVO.setRoomTitle(itripHotelRoom.getRoomTitle());
+                itripPersonalOrderRoomVO.setRoomBedTypeId(itripHotelRoom.getRoomBedTypeId());
+                itripPersonalOrderRoomVO.setIsHavingBreakfast(itripHotelRoom.getIsHavingBreakfast());
+                //itripPersonalOrderRoomVO.setCheckInWeek(1);
+                //itripPersonalOrderRoomVO.setCheckOutWeek(1);
+                //床型LabelDic 父级id
+                List<ItripLabelDicVO> labelDicList=itripLabelDicSerivce.getItripLabelDicById(Long.valueOf(1));
+                itripPersonalOrderRoomVO.setRoomBedTypeName(labelDicList.get(0).getName());
+                return DtoUtil.returnDataSuccess(itripPersonalOrderRoomVO);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }else{
             return DtoUtil.returnFail("token失效，请重登录","100000");
         }
+        return null;
+    }
+    //修改订单的支付方式和状态
+    @RequestMapping(value = "/updateorderstatusandpaytype")
+    public Dto updateorderstatusandpaytype(){
+        System.out.println("修改订单的支付方式和状态方法进入。。。。");
         return null;
     }
         }
