@@ -32,7 +32,7 @@
                          WHERE orderStatus = '0')
     </select>
 
-    <!--<select id="getItripOrderLinkUserListByMap" resultType="com.zhaolong.util.ItripOrderLinkUserVo" parameterType="java.util.Map">
+    <select id="getItripOrderLinkUserListByMap" resultType="com.util.vo.ItripOrderLinkUserVO" parameterType="java.util.Map">
         select
                 linkUserId as linkUserId,
                 linkUserName as linkUserName
@@ -64,7 +64,7 @@
         <if test="beginPos != null and beginPos!='' and pageSize != null  and pageSize !='' ">
             limit #{beginPos},#{pageSize}
         </if>
-    </select>-->
+    </select>
 
     <select id="getItripOrderLinkUserCountByMap" resultType="Integer"  parameterType="java.util.Map">
         select count(*) from itrip_order_link_user

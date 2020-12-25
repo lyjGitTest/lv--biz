@@ -187,6 +187,32 @@ public class ItripPersonalOrderRoomVO {
         return roomBedTypeName;
     }
 
+    @Override
+    public String toString() {
+        return "ItripPersonalOrderRoomVO{" +
+                "id=" + id +
+                ", hotelId=" + hotelId +
+                ", hotelName='" + hotelName + '\'' +
+                ", hotelLevel=" + hotelLevel +
+                ", address='" + address + '\'' +
+                ", roomId=" + roomId +
+                ", roomTitle='" + roomTitle + '\'' +
+                ", roomBedTypeId=" + roomBedTypeId +
+                ", checkInDate=" + checkInDate +
+                ", checkOutDate=" + checkOutDate +
+                ", count=" + count +
+                ", bookingDays=" + bookingDays +
+                ", linkUserName='" + linkUserName + '\'' +
+                ", specialRequirement='" + specialRequirement + '\'' +
+                ", payAmount=" + payAmount +
+                ", roomPayType=" + roomPayType +
+                ", isHavingBreakfast=" + isHavingBreakfast +
+                ", roomBedTypeName='" + roomBedTypeName + '\'' +
+                ", checkInWeek=" + checkInWeek +
+                ", checkOutWeek=" + checkOutWeek +
+                '}';
+    }
+
     public void setRoomBedTypeName(String roomBedTypeName) {
         this.roomBedTypeName = roomBedTypeName;
     }

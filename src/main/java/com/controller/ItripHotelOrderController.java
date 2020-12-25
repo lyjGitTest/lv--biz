@@ -191,13 +191,27 @@ public class ItripHotelOrderController {
         if(EmptyUtils.isNotEmpty(orderId)) {
             try {
                 ItripHotelOrder itripHotelOrder = itripHotelOrderService.getItripHotelOrderById(orderId);
+              SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+                String strDate = sdf.format(itripHotelOrder.getCheckInDate()); //格式化成yyyy-MM-dd格式的时间字符串
+                Date newDate = sdf.parse(strDate);
+                java.sql.Date resultDate = new java.sql.Date(newDate.getTime());
+              itripHotelOrder.setCheckInDate(resultDate);
+
+                String strDate1 = sdf.format(itripHotelOrder.getCheckOutDate()); //格式化成yyyy-MM-dd格式的时间字符串
+                Date newDate1 = sdf.parse(strDate1);
+                java.sql.Date resultDate1 = new java.sql.Date(newDate1.getTime());
+                itripHotelOrder.setCheckOutDate(resultDate1);
+
+                String strDate2 = sdf.format(itripHotelOrder.getCreationDate()); //格式化成yyyy-MM-dd格式的时间字符串
+                Date newDate2 = sdf.parse(strDate2);
+                java.sql.Date resultDate2 = new java.sql.Date(newDate2.getTime());
+                itripHotelOrder.setCreationDate(resultDate2);
+
                 System.out.println("Order===" + itripHotelOrder.toString());
                 ItripModifyHotelOrderVO itripModifyHotelOrderVO=new ItripModifyHotelOrderVO();
                 BeanUtils.copyProperties(itripHotelOrder,itripModifyHotelOrderVO);
                 Map<String, Object> map = new HashMap<>();
-              map.put("startTime", DateUtil.format(itripHotelOrder.getCheckInDate(), "yyyy-MM-dd"));
-              map.put("endTime", DateUtil.format(itripHotelOrder.getCheckOutDate(), "yyyy-MM-dd"));
-              map.put("orderId", itripHotelOrder.getId());
+                map.put("orderId", orderId);
                 List<ItripOrderLinkUserVO> itripOrderLinkUserVOS= itripOrderLinkUserService.getItripOrderLinkUserListByMap(map);
                itripModifyHotelOrderVO.setItripOrderLinkUserList(itripOrderLinkUserVOS);
                 return DtoUtil.returnDataSuccess(itripModifyHotelOrderVO);
@@ -231,7 +245,11 @@ public class ItripHotelOrderController {
                 if(itripSearchOrderVO.getEndDate()==null){
                     map.put("endDate1", null);
                 }else {
-                    map.put("endDate1", itripSearchOrderVO.getEndDate1());
+                    String strDate = sdf.format(itripSearchOrderVO.getEndDate1()); //格式化成yyyy-MM-dd格式的时间字符串
+                    Date newDate = sdf.parse(strDate);
+                    java.sql.Date resultDate = new java.sql.Date(newDate.getTime());
+                    System.out.println("resultdate==="+resultDate);
+                    map.put("endDate1", resultDate);
                 }
                 map.put("pageNo",itripSearchOrderVO.getPageNo());
                 map.put("pageSize",itripSearchOrderVO.getPageSize());
@@ -239,7 +257,10 @@ public class ItripHotelOrderController {
                 if(itripSearchOrderVO.getStartDate()==null) {
                     map.put("startDate", null);
                 }else {
-                    map.put("startDate", itripSearchOrderVO.getStartDate());
+                    String strDate = sdf.format(itripSearchOrderVO.getStartDate()); //格式化成yyyy-MM-dd格式的时间字符串
+                    Date newDate = sdf.parse(strDate);
+                    java.sql.Date resultDate = new java.sql.Date(newDate.getTime());
+                    map.put("startDate", resultDate);
                 }
                 if(EmptyUtils.isEmpty(itripSearchOrderVO.getOrderStatus())){
                     return DtoUtil.returnFail("请传递参数：orderStatus","100502");
@@ -249,7 +270,7 @@ public class ItripHotelOrderController {
                 if(EmptyUtils.isEmpty(itripSearchOrderVO.getOrderType())){
                     return DtoUtil.returnFail("请传递参数：orderType","100501");
                 }else {
-                    map.put("orderType", itripSearchOrderVO.getOrderType() == -1?null:itripSearchOrderVO.getOrderType());
+                    map.put("orderType", itripSearchOrderVO.getOrderType()==-1?null:itripSearchOrderVO.getOrderType());
                 }
                 try {
                     Page page = itripHotelOrderService.getOrderListByMap(map, itripSearchOrderVO.getPageNo(), itripSearchOrderVO.getPageSize());
@@ -337,6 +358,18 @@ public class ItripHotelOrderController {
         if(EmptyUtils.isNotEmpty(itripUser)){
          try {
         ItripPersonalOrderRoomVO itripPersonalOrderRoomVO=itripHotelOrderService.getItripHotelOrderRoomInfoById(orderId);
+             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+             String strDate = sdf.format( itripPersonalOrderRoomVO.getCheckInDate()); //格式化成yyyy-MM-dd格式的时间字符串
+             Date newDate = sdf.parse(strDate);
+             java.sql.Date resultDate = new java.sql.Date(newDate.getTime());
+           itripPersonalOrderRoomVO.setCheckInDate(resultDate);
+
+             String strDate1 = sdf.format(itripPersonalOrderRoomVO.getCheckOutDate()); //格式化成yyyy-MM-dd格式的时间字符串
+             Date newDate1 = sdf.parse(strDate1);
+             java.sql.Date resultDate1 = new java.sql.Date(newDate1.getTime());
+             itripPersonalOrderRoomVO.setCheckOutDate(resultDate1);
+
+             System.out.println("itripPersonalOrderRoomVO===="+itripPersonalOrderRoomVO.toString());
          return DtoUtil.returnDataSuccess(itripPersonalOrderRoomVO);
             } catch (Exception e) {
                 e.printStackTrace();
