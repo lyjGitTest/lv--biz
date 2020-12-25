@@ -9,6 +9,7 @@ import com.util.Constants;
 import com.util.EmptyUtils;
 import com.util.Page;
 import com.util.vo.ItripListHotelOrderVO;
+import com.util.vo.ItripPersonalOrderRoomVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,11 @@ public class ItripHotelOrderServiceImpl implements ItripHotelOrderService {
             }
         }
         return null;
+    }
+
+    @Override
+    public ItripPersonalOrderRoomVO getItripHotelOrderRoomInfoById(Long id) throws Exception {
+        return itripHotelOrderMapper.getItripHotelOrderRoomInfoById(id);
     }
 
     @Override

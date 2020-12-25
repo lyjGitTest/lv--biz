@@ -1,5 +1,6 @@
 package com.mapper;
 import com.po.ItripOrderLinkUser;
+import com.util.vo.ItripOrderLinkUserVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
@@ -9,7 +10,7 @@ public interface ItripOrderLinkUserMapper {
 
 	public ItripOrderLinkUser getItripOrderLinkUserById(@Param(value = "id") Long id)throws Exception;
 
-	//public List<ItripOrderLinkUserVo>	getItripOrderLinkUserListByMap(Map<String, Object> param)throws Exception;
+	public List<ItripOrderLinkUserVO>	getItripOrderLinkUserListByMap(Map<String, Object> param)throws Exception;
 
 	public Integer getItripOrderLinkUserCountByMap(Map<String, Object> param)throws Exception;
 

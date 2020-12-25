@@ -6,6 +6,7 @@ import com.po.*;
 import com.serivce.*;
 import com.util.*;
 import com.util.vo.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.Jedis;
@@ -28,8 +29,8 @@ public class ItripHotelOrderController {
     private ItripHotelSerivce itripHotelSerivce;
     @Autowired
     private ItripHotelTempStoreService itripHotelTempStoreService;
-    @Autowired
-    private ItripLabelDicSerivce itripLabelDicSerivce;
+  @Autowired
+  private ItripOrderLinkUserService itripOrderLinkUserService;
     // 生成订单前,获取预订信息方法
     @RequestMapping(value = "/getpreorderinfo")
     public Dto<RoomStoreVO> getpreorderinfo(HttpServletRequest request, HttpServletResponse response, @RequestBody ValidateRoomStoreVO validateRoomStoreVO) {
@@ -191,19 +192,15 @@ public class ItripHotelOrderController {
             try {
                 ItripHotelOrder itripHotelOrder = itripHotelOrderService.getItripHotelOrderById(orderId);
                 System.out.println("Order===" + itripHotelOrder.toString());
-                ItripHotelRoom itripHotelRoom = itripHotelRoomSerivce.getItripHotelRoomById(itripHotelOrder.getRoomId());
+                ItripModifyHotelOrderVO itripModifyHotelOrderVO=new ItripModifyHotelOrderVO();
+                BeanUtils.copyProperties(itripHotelOrder,itripModifyHotelOrderVO);
                 Map<String, Object> map = new HashMap<>();
-                map.put("count", itripHotelOrder.getCount());
-                map.put("hotelId", itripHotelOrder.getHotelId());
-                map.put("roomId", itripHotelOrder.getRoomId());
-                map.put("roomTitle", itripHotelRoom.getRoomTitle());
-                map.put("hotelName", itripHotelOrder.getHotelName());
-                map.put("payAmount", itripHotelOrder.getPayAmount().intValue());
               map.put("startTime", DateUtil.format(itripHotelOrder.getCheckInDate(), "yyyy-MM-dd"));
-                map.put("endTime", DateUtil.format(itripHotelOrder.getCheckOutDate(), "yyyy-MM-dd"));
-                map.put("bookingDays", itripHotelOrder.getBookingDays());
-                System.out.println("map==" + map);
-                return DtoUtil.returnDataSuccess(map);
+              map.put("endTime", DateUtil.format(itripHotelOrder.getCheckOutDate(), "yyyy-MM-dd"));
+              map.put("orderId", itripHotelOrder.getId());
+                List<ItripOrderLinkUserVO> itripOrderLinkUserVOS= itripOrderLinkUserService.getItripOrderLinkUserListByMap(map);
+               itripModifyHotelOrderVO.setItripOrderLinkUserList(itripOrderLinkUserVOS);
+                return DtoUtil.returnDataSuccess(itripModifyHotelOrderVO);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -288,11 +285,16 @@ public class ItripHotelOrderController {
              itripPersonalHotelOrderVO.setBookType(itripHotelOrder.getBookType());
              itripPersonalHotelOrderVO.setNoticePhone(itripHotelOrder.getNoticePhone());
              itripPersonalHotelOrderVO.setPayAmount(itripHotelOrder.getPayAmount());
+               SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+               String strDate = sdf.format(itripHotelOrder.getCreationDate()); //格式化成yyyy-MM-dd格式的时间字符串
+               Date newDate = sdf.parse(strDate);
+               java.sql.Date resultDate = new java.sql.Date(newDate.getTime());
+             itripPersonalHotelOrderVO.setCreationDate(resultDate);
                //支付方式:1:支付宝 2:微信 3:到店付
              itripPersonalHotelOrderVO.setPayType(itripHotelOrder.getPayType());
-             itripPersonalHotelOrderVO.setProcessNode("");
                //房间支持的支付方式 {"1":"在线付","2":"线下付","3":"不限"}
-             itripPersonalHotelOrderVO.setRoomPayType(1);
+               ItripHotelRoom itripHotelRoom=itripHotelRoomSerivce.getItripHotelRoomById(itripHotelOrder.getRoomId());
+             itripPersonalHotelOrderVO.setRoomPayType(itripHotelRoom.getPayType());
                /**
                 * 订单流程:
                 * 1、待付款、待评价（已消费）、未出行（支付成功）
@@ -303,12 +305,19 @@ public class ItripHotelOrderController {
                Object process=null;
                if(orderStatus==0){
                    //待支付
-               }else if(orderStatus==1){
-                   //已取消
+                   itripPersonalHotelOrderVO.setProcessNode("1");
+               }else if(orderStatus==2){
+                   itripPersonalHotelOrderVO.setProcessNode("3");
+               }else if(orderStatus==3){
+                   itripPersonalHotelOrderVO.setProcessNode("5");
+               }else if(orderStatus==4){
+                   itripPersonalHotelOrderVO.setProcessNode("6");
+               }else {
+                   itripPersonalHotelOrderVO.setProcessNode(null);
                }
              itripPersonalHotelOrderVO.setOrderProcess(process);
                System.out.println("personalVo==="+itripPersonalHotelOrderVO.toString());
-               return DtoUtil.returnDataSuccess(itripPersonalHotelOrderVO.toString());
+               return DtoUtil.returnDataSuccess(itripPersonalHotelOrderVO);
            } catch (Exception e) {
                e.printStackTrace();
            }
@@ -326,47 +335,9 @@ public class ItripHotelOrderController {
         JSONObject jsonObject=JSONObject.parseObject(jedis.get(token));
         ItripUser itripUser=JSONObject.toJavaObject(jsonObject,ItripUser.class);
         if(EmptyUtils.isNotEmpty(itripUser)){
-          ItripPersonalOrderRoomVO itripPersonalOrderRoomVO=new ItripPersonalOrderRoomVO();
-            try {
-                ItripHotelOrder itripHotelOrder=itripHotelOrderService.getItripHotelOrderById(orderId);
-                itripPersonalOrderRoomVO.setId(orderId);
-                itripPersonalOrderRoomVO.setHotelId(itripHotelOrder.getHotelId());
-                itripPersonalOrderRoomVO.setHotelName(itripHotelOrder.getHotelName());
-                itripPersonalOrderRoomVO.setBookingDays(itripHotelOrder.getBookingDays());
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");    //格式化规则
-
-                Date date = itripHotelOrder.getCheckInDate();         //获得你要处理的时间 Date型
-                String strDate= sdf.format(date); //格式化成yyyy-MM-dd格式的时间字符串
-                Date newDate =sdf.parse(strDate);
-                java.sql.Date resultDate = new java.sql.Date(newDate.getTime());
-                itripPersonalOrderRoomVO.setCheckInDate(resultDate);
-
-                Date date1 = itripHotelOrder.getCheckOutDate();         //获得你要处理的时间 Date型
-                String strDate1= sdf.format(date1); //格式化成yyyy-MM-dd格式的时间字符串
-                Date newDate1 =sdf.parse(strDate1);
-                java.sql.Date resultDate1 = new java.sql.Date(newDate1.getTime());
-                itripHotelOrder.setCheckOutDate(resultDate1);
-
-                itripPersonalOrderRoomVO.setCount(itripHotelOrder.getCount());
-                itripPersonalOrderRoomVO.setCheckOutDate(itripHotelOrder.getCheckOutDate());
-                itripPersonalOrderRoomVO.setLinkUserName(itripHotelOrder.getLinkUserName());
-                itripPersonalOrderRoomVO.setSpecialRequirement(itripHotelOrder.getSpecialRequirement());
-                itripPersonalOrderRoomVO.setPayAmount(itripHotelOrder.getPayAmount());
-                itripPersonalOrderRoomVO.setRoomPayType(1);
-                ItripHotel itripHotel=itripHotelSerivce.getItripHotelById(itripHotelOrder.getHotelId());
-                itripPersonalOrderRoomVO.setHotelLevel(itripHotel.getHotelLevel());
-                itripPersonalOrderRoomVO.setAddress(itripHotel.getAddress());
-                itripPersonalOrderRoomVO.setRoomId(itripHotelOrder.getRoomId());
-                ItripHotelRoom itripHotelRoom=itripHotelRoomSerivce.getItripHotelRoomById(itripHotelOrder.getRoomId());
-                itripPersonalOrderRoomVO.setRoomTitle(itripHotelRoom.getRoomTitle());
-                itripPersonalOrderRoomVO.setRoomBedTypeId(itripHotelRoom.getRoomBedTypeId());
-                itripPersonalOrderRoomVO.setIsHavingBreakfast(itripHotelRoom.getIsHavingBreakfast());
-                //itripPersonalOrderRoomVO.setCheckInWeek(1);
-                //itripPersonalOrderRoomVO.setCheckOutWeek(1);
-                //床型LabelDic 父级id
-                List<ItripLabelDicVO> labelDicList=itripLabelDicSerivce.getItripLabelDicById(Long.valueOf(1));
-                itripPersonalOrderRoomVO.setRoomBedTypeName(labelDicList.get(0).getName());
-                return DtoUtil.returnDataSuccess(itripPersonalOrderRoomVO);
+         try {
+        ItripPersonalOrderRoomVO itripPersonalOrderRoomVO=itripHotelOrderService.getItripHotelOrderRoomInfoById(orderId);
+         return DtoUtil.returnDataSuccess(itripPersonalOrderRoomVO);
             } catch (Exception e) {
                 e.printStackTrace();
             }
