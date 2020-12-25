@@ -199,8 +199,6 @@ public class ItripHotelOrderController {
                 map.put("roomTitle", itripHotelRoom.getRoomTitle());
                 map.put("hotelName", itripHotelOrder.getHotelName());
                 map.put("payAmount", itripHotelOrder.getPayAmount().intValue());
-                /*map.put("startTime",itripHotelOrder.getCheckInDate());
-                map.put("endTime",itripHotelOrder.getCheckOutDate());*/
               map.put("startTime", DateUtil.format(itripHotelOrder.getCheckInDate(), "yyyy-MM-dd"));
                 map.put("endTime", DateUtil.format(itripHotelOrder.getCheckOutDate(), "yyyy-MM-dd"));
                 map.put("bookingDays", itripHotelOrder.getBookingDays());
@@ -226,7 +224,7 @@ public class ItripHotelOrderController {
         if(EmptyUtils.isNotEmpty(itripUser)) {
             Integer orderStatus=itripSearchOrderVO.getOrderStatus();
             if(orderStatus!=-1) {
-            return DtoUtil.returnFail("订单状态","111111");
+            return DtoUtil.returnFail("修改订单状态","111111");
             }
             System.out.println("itripSearchOrderVO==="+itripSearchOrderVO.toString());
                 Map<String, Object> map = new HashMap<>();
@@ -234,23 +232,35 @@ public class ItripHotelOrderController {
                 map.put("orderNo",itripSearchOrderVO.getOrderNo());
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 if(itripSearchOrderVO.getEndDate()==null){
-                    map.put("endDate", null);
+                    map.put("endDate1", null);
                 }else {
-                    String strDate = sdf.format(itripSearchOrderVO.getEndDate()); //格式化成yyyy-MM-dd格式的时间字符串
-                    Date newDate = sdf.parse(strDate);
-                    java.sql.Date resultDate = new java.sql.Date(newDate.getTime());
-                    map.put("endDate", resultDate);
+                    map.put("endDate1", itripSearchOrderVO.getEndDate1());
                 }
                 map.put("pageNo",itripSearchOrderVO.getPageNo());
                 map.put("pageSize",itripSearchOrderVO.getPageSize());
                 map.put("linkUserName",itripSearchOrderVO.getLinkUserName());
-                map.put("startDate",itripSearchOrderVO.getStartDate());
-                map.put("orderStatus",itripSearchOrderVO.getOrderStatus()==-1?null:itripSearchOrderVO.getOrderStatus());
-                map.put("orderType",itripSearchOrderVO.getOrderType()==-1?null:itripSearchOrderVO.getOrderType());
-            System.out.println("map===="+map.get("endDate"));
+                if(itripSearchOrderVO.getStartDate()==null) {
+                    map.put("startDate", null);
+                }else {
+                    map.put("startDate", itripSearchOrderVO.getStartDate());
+                }
+                if(EmptyUtils.isEmpty(itripSearchOrderVO.getOrderStatus())){
+                    return DtoUtil.returnFail("请传递参数：orderStatus","100502");
+                }else {
+                    map.put("orderStatus", itripSearchOrderVO.getOrderStatus()== -1? null : itripSearchOrderVO.getOrderStatus());
+                }
+                if(EmptyUtils.isEmpty(itripSearchOrderVO.getOrderType())){
+                    return DtoUtil.returnFail("请传递参数：orderType","100501");
+                }else {
+                    map.put("orderType", itripSearchOrderVO.getOrderType() == -1?null:itripSearchOrderVO.getOrderType());
+                }
                 try {
                     Page page = itripHotelOrderService.getOrderListByMap(map, itripSearchOrderVO.getPageNo(), itripSearchOrderVO.getPageSize());
-               return DtoUtil.returnDataSuccess(page);
+               if(EmptyUtils.isEmpty(page)){
+                   return DtoUtil.returnFail("获取个人订单列表错误","100503");
+               }else {
+                   return DtoUtil.returnDataSuccess(page);
+               }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

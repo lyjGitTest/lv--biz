@@ -23,7 +23,7 @@ public class ItripSearchOrderVO {
 
     /*@ApiModelProperty("[非必填] 预定时间（end）")*/
     private Date endDate;
-    //private String endDate1;
+    private String endDate1;
 
    /* @ApiModelProperty("[必填] 页面容量")*/
     private Integer pageSize;
@@ -110,16 +110,16 @@ public class ItripSearchOrderVO {
 
         this.startDate1 = startDate1;
     }
-
+*/
     public String getEndDate1() {
-        endDate1=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endDate);
+       // endDate1=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endDate);
         return endDate1;
     }
 
     public void setEndDate1(String endDate1) {
         this.endDate1 = endDate1;
     }
-*/
+
     @Override
     public String toString() {
         return "ItripSearchOrderVO{" +

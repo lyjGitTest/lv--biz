@@ -83,11 +83,12 @@
         hotelName as hotelName,
         orderStatus as orderStatus,
         count as count,
-        checkInDate as d,
+        checkInDate as checkInDate,
+        checkOutDate as checkOutDate,
         payAmount as payAmount,
         payType as payType,
         linkUserName as linkUserName,
-        creationDate as creationDate
+        creationDate as creationDate1
         from itrip_hotel_order
         <trim prefix="where" prefixOverrides="and | or">
             <if test="id != null and id!=''">
@@ -123,8 +124,8 @@
             <if test="startDate != null and startDate!=''">
                 and creationDate &gt;= #{startDate}
             </if>
-            <if test="endDate != null and endDate!=''">
-                and creationDate &lt;= #{endDate}
+            <if test="endDate1!= null and endDate1!=''">
+                and creationDate &lt;= #{endDate1}
             </if>
         </trim>
         order by creationDate desc

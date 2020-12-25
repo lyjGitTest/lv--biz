@@ -56,7 +56,7 @@ public class ItripHotelOrderServiceImpl implements ItripHotelOrderService {
 
     @Override
     public Page<ItripListHotelOrderVO> getOrderListByMap(Map<String, Object> param,Integer pageNo,Integer pageSize) throws Exception {
-       Integer c=itripHotelOrderMapper.getOrderCountByMap(param);
+        Integer c=itripHotelOrderMapper.getOrderCountByMap(param);
         pageNo= EmptyUtils.isEmpty(pageNo)?Constants.DEFAULT_PAGE_NO:pageNo;
         pageSize=EmptyUtils.isEmpty(pageSize)?Constants.DEFAULT_PAGE_SIZE:pageSize;
         Page page=new Page(pageNo,pageSize,c);
@@ -65,16 +65,15 @@ public class ItripHotelOrderServiceImpl implements ItripHotelOrderService {
         List<ItripListHotelOrderVO> itripListHotelOrderVOS=itripHotelOrderMapper.getOrderListByMap(param);
         for(ItripListHotelOrderVO itripListHotelOrderVO:itripListHotelOrderVOS) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String strDate = sdf.format(itripListHotelOrderVO.getCreationDate()); //格式化成yyyy-MM-dd格式的时间字符串
+            String strDate = sdf.format(itripListHotelOrderVO.getCreationDate1()); //格式化成yyyy-MM-dd格式的时间字符串
             Date newDate = sdf.parse(strDate);
             java.sql.Date resultDate = new java.sql.Date(newDate.getTime());
-            itripListHotelOrderVO.setCreationDate(resultDate);
+            itripListHotelOrderVO.setCheckInDate(resultDate);
 
-            String date=sdf.format(itripListHotelOrderVO.getCheckInDate());
-            Date date1=sdf.parse(date);
-            java.sql.Date resultDate1 = new java.sql.Date(date1.getTime());
-            itripListHotelOrderVO.setCheckInDate(resultDate1);
-     //itripListHotelOrderVO.setD(resultDate+"/"+resultDate1);
+            SimpleDateFormat sdf1=new SimpleDateFormat("MM-dd");
+            String strDate1 = sdf1.format(itripListHotelOrderVO.getCheckInDate());
+            String date=sdf1.format(itripListHotelOrderVO.getCheckOutDate());
+            itripListHotelOrderVO.setCreationDate(strDate1+"/"+date);
         }
         page.setRows(itripListHotelOrderVOS);
         return page;

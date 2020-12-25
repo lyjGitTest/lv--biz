@@ -16,21 +16,35 @@ public class ItripListHotelOrderVO {
     private String orderNo;         //订单号
     private Integer orderType;      //订单类型
     private String linkUserName;	//旅客的姓名，多个旅客的姓名之间用逗号隔开
-    private Date creationDate;      //预定时间
-    private Date checkInDate;       //入住时间（行程/有效日期）
-   // private String d;
+    private String creationDate;
+    private Date creationDate1;      //预定时间
+    private Date checkInDate;//入住时间（行程/有效日期）
+    private Date checkOutDate;
+
     private BigDecimal payAmount;   //订单金额
+
     private Integer orderStatus;    //订单状态（0：待支付 1:已取消 2:支付成功 3:已消费）
 
-    /*public String getD() {
-        d=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(checkInDate);
-        return d;
+    public Date getCheckOutDate() {
+        return checkOutDate;
     }
 
-    public void setD(String d) {
-        this.d = d;
+    public void setCheckOutDate(Date checkOutDate) {
+        this.checkOutDate = checkOutDate;
     }
-*/
+
+    public Date getCreationDate1() {
+        return creationDate1;
+    }
+
+    public void setCreationDate1(Date creationDate1) {
+        this.creationDate1 = creationDate1;
+    }
+
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
+    }
+
     public Long getId() {
         return id;
     }
@@ -79,12 +93,8 @@ public class ItripListHotelOrderVO {
         this.linkUserName = linkUserName;
     }
 
-    public Date getCreationDate() {
+    public String getCreationDate() {
         return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
     }
 
     public Date getCheckInDate() {
@@ -109,5 +119,22 @@ public class ItripListHotelOrderVO {
 
     public void setOrderStatus(Integer orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "ItripListHotelOrderVO{" +
+                "id=" + id +
+                ", hotelId=" + hotelId +
+                ", hotelName='" + hotelName + '\'' +
+                ", orderNo='" + orderNo + '\'' +
+                ", orderType=" + orderType +
+                ", linkUserName='" + linkUserName + '\'' +
+                ", creationDate=" + creationDate +
+                ", checkInDate=" + checkInDate +
+                ", checkOutDate=" + checkOutDate +
+                ", payAmount=" + payAmount +
+                ", orderStatus=" + orderStatus +
+                '}';
     }
 }
